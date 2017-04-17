@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "placeholder.js",
+  "sourceRoot": "",
+  "sources": [
+    "placeholder.coffee"
+  ],
+  "names": [],
+  "mappings": "AAAA;EAAA,UAAA,CAAW,SAAA;AACT,QAAA;IAAA,WAAA,GAAc,CAAA,CAAE,4DAAF;WACd,CAAA,CAAE,OAAF,CAAU,CAAC,MAAX,CAAkB,WAAlB;EAFS,CAAX;;EAIA,SAAA,CAAU,SAAA;WACR,CAAA,CAAE,OAAF,CAAU,CAAC,KAAX,CAAA;EADQ,CAAV;AAJA"
+}
