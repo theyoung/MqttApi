@@ -45,48 +45,77 @@ var MOSCA_SERVER_EVENT = {
 
 server.on(
     MOSCA_SERVER_EVENT.CLIENT_CONNECTED,
-    function(client){
-      console.log('Client Connected = ' + client.id)
-    }
+    clientConnected
 );
+
+
+function clientConnected(client){
+    console.log('Client Connected = ' + client.id);
+}
+
 
 server.on(
     MOSCA_SERVER_EVENT.CLIENT_DISCONNECTING,
-    function(client){
-        console.log('Client CLIENT_DISCONNECTING = ' + client.id)
-    }
+    clientDisconnecting
 );
+
+function clientDisconnecting(client){
+    console.log('Client CLIENT_DISCONNECTING = ' + client.id);
+}
+
+
 server.on(
     MOSCA_SERVER_EVENT.CLIENT_DISCONNECTED,
-    function(client){
-        console.log('Client CLIENT_DISCONNECTED = ' + client.id)
-    }
+    clientDisconnected
 );
+
+function clientDisconnected(client){
+    console.log('Client CLIENT_DISCONNECTED = ' + client.id);
+}
+
 
 server.on(
     MOSCA_SERVER_EVENT.PUBLISHED,
-    function(packet,client){
-        var id = 'none Client Info'
-        if (client != null && client != undefined){
-            id = client.id
-        }
-        console.log('Client PUBLISHED = ' + packet.topic + ' / ' + id)
-    }
+    published
 );
+
+function published(packet,client){
+    var id = 'none Client Info';
+    if (client != null && client != undefined){
+        id = client.id;
+    }
+    console.log('Client PUBLISHED = ' + packet.topic + ' / ' + id);
+
+    if(packet.payload != null && packet.payload !=undefined){
+        var payload = packet.payload;
+        if(typeof payload == 'string'){
+            console.log('Client PUBLISHED Payload = ' + payload);
+        } else if (payload instanceof Uint8Array){
+            console.log('Client PUBLISHED Payload = Uint8Array [ ' + payload + ' ]');
+        }
+    }
+}
+
 
 server.on(
     MOSCA_SERVER_EVENT.SUBSCRIBED,
-    function(topic,client){
-        console.log('Client SUBSCRIBED = ' + topic + ' / ' + client.id)
-    }
+    subscribed
 );
+
+function subscribed(topic,client){
+    console.log('Client SUBSCRIBED = ' + topic + ' / ' + client.id);
+}
+
 
 server.on(
     MOSCA_SERVER_EVENT.UNSUBSCRIBED,
-    function(topic,client){
-        console.log('Client UNSUBSCRIBED = ' + topic + ' / ' + client.id)
-    }
+    unsubscribed
 );
+
+function unsubscribed(topic,client){
+    console.log('Client UNSUBSCRIBED = ' + topic + ' / ' + client.id);
+}
+
 
 server.on(
     MOSCA_SERVER_EVENT.READY,
@@ -115,6 +144,24 @@ var router = express.Router();
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index.html', { title: 'Express' });
+});
+
+router.post('/get/clients',function(req,res){
+
+    var clients = [];
+
+    for (name in server.clients){
+        obj = server.clients[name];
+
+        protoType = obj.constructor.name;
+
+
+        if(protoType == 'Client'){
+            clients.push({id:obj.id});
+        }
+    }
+
+    return res.send(clients);
 });
 
 module.exports = router;
