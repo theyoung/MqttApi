@@ -48,9 +48,11 @@ server.on(
     clientConnected
 );
 
+var clientIdPool = {};
 
 function clientConnected(client){
     console.log('Client Connected = ' + client.id);
+    clientIdPool[client.id] = client;
 }
 
 
@@ -61,6 +63,7 @@ server.on(
 
 function clientDisconnecting(client){
     console.log('Client CLIENT_DISCONNECTING = ' + client.id);
+
 }
 
 
@@ -71,6 +74,10 @@ server.on(
 
 function clientDisconnected(client){
     console.log('Client CLIENT_DISCONNECTED = ' + client.id);
+
+    if(clientIdPool[client.id] != null || clientIdPool[client.id] != undefined){
+        delete clientIdPool[client.id];
+    }
 }
 
 
@@ -80,6 +87,11 @@ server.on(
 );
 
 function published(packet,client){
+
+    if(packet.topic.startsWith('$SYS')){
+        return;
+    }
+
     var id = 'none Client Info';
     if (client != null && client != undefined){
         id = client.id;
@@ -162,6 +174,25 @@ router.post('/get/clients',function(req,res){
     }
 
     return res.send(clients);
+});
+
+router.post('/send/publish',function(req,res){
+    var params = req.body;
+
+    var topic = params.topic;
+
+    var payload = params.payload;
+
+    server.publish({
+        topic: topic,
+        payload: payload,
+        qos : 0,
+        retain : false
+    },function(){
+        console.log('Send Done');
+        return res.send(params);
+    });
+
 });
 
 module.exports = router;
